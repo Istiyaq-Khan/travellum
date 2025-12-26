@@ -105,10 +105,10 @@ export default function CountrySearchPage() {
                         className="text-center mb-12"
                     >
                         <h1 className="text-5xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-teal-400 to-blue-500 bg-clip-text text-transparent">
-                            Explore Countries
+                            Explore Destinations
                         </h1>
                         <p className="text-gray-400 text-lg">
-                            Search for any country to get AI-powered travel insights
+                            Search for any destination to get AI-powered travel insights
                         </p>
                     </motion.div>
 
@@ -127,7 +127,7 @@ export default function CountrySearchPage() {
                                 <input
                                     type="text"
                                     className="relative w-full bg-white/10 backdrop-blur-md border border-white/10 rounded-full py-4 pl-14 pr-32 text-lg focus:outline-none focus:border-teal-500 transition shadow-xl"
-                                    placeholder="Search for a country..."
+                                    placeholder="Search for a destination..."
                                     value={searchQuery}
                                     onChange={(e) => setSearchQuery(e.target.value)}
                                     onFocus={() => searchQuery && setShowAutocomplete(true)}

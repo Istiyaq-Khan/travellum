@@ -18,7 +18,7 @@ export default function Navbar() {
 
     const navLinks = [
         { name: "Dashboard", href: "/dashboard" },
-        { name: "Country Search", href: "/country" },
+        { name: "Destinations", href: "/country" },
         { name: "Recommend", href: "/recommend" },
     ];
 
