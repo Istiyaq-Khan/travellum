@@ -77,9 +77,6 @@ export default function CountryPage({ params }: { params: Promise<{ slug: string
             <div className="relative h-[40vh] w-full bg-gray-900 overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black" />
                 <div className="absolute bottom-0 left-0 p-8 md:p-16 z-10 w-full">
-                    <Link href="/dashboard" className="inline-flex items-center text-gray-400 hover:text-white mb-6 transition">
-                        <ArrowLeft className="w-4 h-4 mr-2" /> Back to Dashboard
-                    </Link>
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                         <div>
                             <h1 className="text-5xl md:text-7xl font-bold text-white mb-2">{data.name}</h1>
