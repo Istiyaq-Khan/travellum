@@ -87,8 +87,21 @@ export default function CountryPage({ params }: { params: Promise<{ slug: string
                         </div>
                         {/* Audio Controls */}
                         <div className="flex gap-3">
-                            <AudioPlayer text={data.historyText} label="History" className="bg-purple-500 hover:bg-purple-400" />
-                            <AudioPlayer text={data.advisoryText} label="Safety Advisory" />
+                            <AudioPlayer
+                                text={data.historyText}
+                                label="History"
+                                className="bg-purple-500 hover:bg-purple-400"
+                                slug={data.slug}
+                                audioKey="history"
+                                initialAudioUrl={data.audioUrls?.history}
+                            />
+                            <AudioPlayer
+                                text={data.advisoryText}
+                                label="Safety Advisory"
+                                slug={data.slug}
+                                audioKey="advisory"
+                                initialAudioUrl={data.audioUrls?.advisory}
+                            />
                         </div>
                     </div>
                 </div>

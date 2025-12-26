@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
+import Navbar from "@/components/Navbar";
 
 export default function Home() {
   const { user, loading } = useAuth();
@@ -16,22 +17,7 @@ export default function Home() {
       </div>
 
       {/* Navigation */}
-      <nav className="relative z-10 container mx-auto px-6 py-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold tracking-tighter bg-gradient-to-r from-teal-400 to-emerald-400 bg-clip-text text-transparent">
-          TRAVELLUM
-        </h1>
-        <div className="space-x-4">
-          {!loading && user ? (
-            <Link href="/profile" className="px-5 py-2 rounded-full border border-white/10 hover:bg-white/10 transition backdrop-blur-md">
-              Dashboard
-            </Link>
-          ) : (
-            !loading && <Link href="/login" className="px-5 py-2 rounded-full border border-white/10 hover:bg-white/10 transition backdrop-blur-md">
-              Login
-            </Link>
-          )}
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Hero Section */}
       <main className="relative z-10 container mx-auto px-6 pt-20 flex flex-col items-center text-center">

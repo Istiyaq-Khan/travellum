@@ -104,3 +104,32 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const { slug, audioUrl, audioType } = await req.json(); // audioType: 'advisory' | 'history'
+
+    if (!slug || !audioUrl || !audioType) {
+      return NextResponse.json({ error: 'Slug, Audio URL, and Audio Type are required' }, { status: 400 });
+    }
+
+    await dbConnect();
+
+    const updateField = `audioUrls.${audioType}`;
+
+    const updatedCountry = await Country.findOneAndUpdate(
+      { slug },
+      { $set: { [updateField]: audioUrl } },
+      { new: true }
+    );
+
+    if (!updatedCountry) {
+      return NextResponse.json({ error: 'Country not found' }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedCountry);
+  } catch (error: any) {
+    console.error('API Error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

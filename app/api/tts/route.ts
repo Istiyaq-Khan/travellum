@@ -1,52 +1,124 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ElevenLabsClient } from 'elevenlabs';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import { writeFile, readFile, unlink } from 'fs/promises';
+import path from 'path';
+import { tmpdir } from 'os';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
+import { getStorage } from 'firebase-admin/storage';
+import dbConnect from '@/lib/mongodb';
+import Country from '@/models/Country';
 
-const apiKey = process.env.ELEVENLABS_API_KEY;
-console.log('TTS Debug: API Key present:', !!apiKey, 'Length:', apiKey?.length);
+const execAsync = promisify(exec);
 
-const elevenlabs = new ElevenLabsClient({
-    apiKey: apiKey
-});
+// Initialize Firebase Admin SDK (server-side)
+if (!getApps().length) {
+    initializeApp({
+        credential: cert({
+            projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+            clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+            privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        }),
+        storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    });
+}
 
 export async function POST(req: NextRequest) {
+    const tempFile = path.join(tmpdir(), `tts-${Date.now()}.mp3`);
+
     try {
-        const { text, voiceId } = await req.json();
+        const { text, voiceId, slug, audioKey } = await req.json();
 
         if (!text) {
             return NextResponse.json({ error: 'Text is required' }, { status: 400 });
         }
 
-        // Default voice: "Adam" (premade stable voice) or a similar standard one
-        // Using a specific ID if known, otherwise default.
-        // Rachel: 21m00Tcm4TlvDq8ikWAM
-        const VOICE_ID = voiceId || '21m00Tcm4TlvDq8ikWAM';
+        console.log(`TTS Request: "${text.substring(0, 50)}..."`);
 
-        const audioStream = await elevenlabs.generate({
-            voice: VOICE_ID,
-            text: text,
-            model_id: "eleven_monolingual_v1"
+        // Use Microsoft Edge TTS (completely free, no API key needed)
+        // Voice: en-US-AriaNeural (female, high quality)
+        const voice = voiceId || 'en-US-AriaNeural';
+
+        // Escape text for command line (Windows PowerShell safe)
+        const escapedText = text.replace(/"/g, '`"').replace(/'/g, "`'");
+
+        // Generate audio using edge-tts (Python module)
+        const command = `python -m edge_tts --voice "${voice}" --text "${escapedText}" --write-media "${tempFile}"`;
+
+        console.log('Generating audio with edge-tts...');
+        await execAsync(command, {
+            maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+            timeout: 30000, // 30 second timeout
+            shell: 'powershell.exe'
         });
 
-        // Handle stream to buffer conversion if necessary, or stream directly.
-        // For Next.js App Router, we can return the stream directly or a buffer.
-        // ElevenLabs SDK `generate` returns a readable stream (Node).
+        // Read the generated audio file
+        const audioBuffer = await readFile(tempFile);
 
-        // To send this to client, we can collect chunks.
-        const chunks: Buffer[] = [];
-        for await (const chunk of audioStream) {
-            chunks.push(Buffer.from(chunk));
+        console.log(`✅ TTS generated: ${audioBuffer.length} bytes`);
+
+        let audioUrl: string | null = null;
+
+        // If slug and audioKey are provided, upload to Firebase and save to MongoDB
+        if (slug && audioKey) {
+            try {
+                console.log(`Uploading audio to Firebase Storage...`);
+
+                const bucket = getStorage().bucket();
+                const fileName = `search-audios/${slug}-${audioKey}.mp3`;
+                const file = bucket.file(fileName);
+
+                // Upload the audio buffer
+                await file.save(audioBuffer, {
+                    metadata: {
+                        contentType: 'audio/mpeg',
+                    },
+                });
+
+                // Make the file publicly accessible
+                await file.makePublic();
+
+                // Get the public URL
+                audioUrl = `https://storage.googleapis.com/${bucket.name}/${fileName}`;
+                console.log(`✅ Audio uploaded: ${audioUrl}`);
+
+                // Update MongoDB with the audio URL
+                await dbConnect();
+                const updateField = `audioUrls.${audioKey}`;
+                await Country.findOneAndUpdate(
+                    { slug },
+                    { $set: { [updateField]: audioUrl } },
+                    { new: true }
+                );
+                console.log(`✅ MongoDB updated for ${slug}`);
+
+            } catch (uploadError: any) {
+                console.error('Upload/DB error:', uploadError);
+                // Continue anyway - we still have the audio to return
+            }
         }
-        const audioBuffer = Buffer.concat(chunks);
 
+        // Clean up temp file
+        await unlink(tempFile).catch(() => { });
+
+        // Return audio with optional URL
         return new NextResponse(audioBuffer, {
             headers: {
                 'Content-Type': 'audio/mpeg',
                 'Content-Length': audioBuffer.length.toString(),
+                'X-Audio-Url': audioUrl || '', // Include the storage URL in header
             },
         });
 
     } catch (error: any) {
-        console.error('TTS Error:', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        // Clean up temp file on error
+        await unlink(tempFile).catch(() => { });
+
+        console.error('TTS Error Detail:', error);
+        const message = error.message || error.stderr || "Unknown error";
+        return NextResponse.json({
+            error: `TTS generation failed: ${message}`
+        }, { status: 500 });
     }
 }
+

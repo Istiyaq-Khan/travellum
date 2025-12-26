@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Audio Playback</title>
+</head>
+<body>
+    <h1>Audio Playback Test</h1>
+    <button id="testBtn">Test Audio from API</button>
+    <button id="testFileBtn">Test Local File</button>
+    <div id="status"></div>
+    <audio id="audioPlayer" controls style="display:block; margin-top:20px;"></audio>
+
+    <script>
+        const status = document.getElementById('status');
+        const audioPlayer = document.getElementById('audioPlayer');
+
+        // Test API endpoint
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            status.textContent = 'Fetching audio from API...';
+            try {
+                const response = await fetch('/api/tts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: 'Hello, this is a test.' })
+                });
+
+                if (!response.ok) {
+                    throw new Error('API returned ' + response.status);
+                }
+
+                const blob = await response.blob();
+                status.textContent = `Got blob: ${blob.size} bytes, type: ${blob.type}`;
+                
+                const url = URL.createObjectURL(blob);
+                audioPlayer.src = url;
+                audioPlayer.play();
+                
+            } catch (e) {
+                status.textContent = 'Error: ' + e.message;
+                console.error(e);
+            }
+        });
+
+        // Test local file
+        document.getElementById('testFileBtn').addEventListener('click', () => {
+            audioPlayer.src = '/test-audio.mp3';
+            audioPlayer.play();
+            status.textContent = 'Playing local file';
+        });
+    </script>
+</body>
+</html>

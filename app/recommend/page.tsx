@@ -40,9 +40,6 @@ export default function RecommendPage() {
             <Navbar />
 
             <div className="p-6">
-                <Link href="/dashboard" className="text-gray-400 hover:text-white flex items-center gap-2 mb-8">
-                    <ArrowLeft className="w-5 h-5" /> Back to Dashboard
-                </Link>
 
                 <header className="max-w-4xl mx-auto text-center mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent mb-4">

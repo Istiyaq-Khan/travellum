@@ -40,6 +40,10 @@ export interface ICountry extends Document {
     // AI Generated Content
     advisoryText: string; // Detailed advisory
     historyText: string; // Storytelling
+    audioUrls?: {
+        advisory?: string;
+        history?: string;
+    };
 
     // Cache Tracking
     lastUpdated: Date;
@@ -82,6 +86,10 @@ const CountrySchema = new Schema<ICountry>(
 
         advisoryText: String,
         historyText: String,
+        audioUrls: {
+            advisory: String,
+            history: String,
+        },
 
         lastUpdated: { type: Date, default: Date.now },
     },
