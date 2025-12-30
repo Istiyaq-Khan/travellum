@@ -152,7 +152,7 @@ export default function Home() {
               <span className="text-gray-500">Low Cost.</span>
             </h2>
             <p className="text-xl text-gray-400 mb-8 leading-relaxed">
-              We've engineered Travellum to be as efficient as it is powerful. By leveraging smart caching and open-source models, we deliver premium features without the premium price tag.
+              We've engineered Travellum to be as efficient as it is powerful. By leveraging smart caching, we deliver premium features without the premium price.
             </p>
 
             <div className="space-y-6">
