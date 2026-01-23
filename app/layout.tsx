@@ -88,7 +88,7 @@ const personSchema = {
     "https://www.instagram.com/ist.iyaqkhan",
     "https://www.youtube.com/@istiyaq-khan10",
     "https://x.com/istiyaqkhanr",
-    "https://istiyaq.vercel.app"'
+    "https://istiyaq.vercel.app",
   ],
   knowsAbout: [
     "Video Editing",
