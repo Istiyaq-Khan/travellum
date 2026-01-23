@@ -18,16 +18,27 @@ export const metadata: Metadata = {
     default: "Travellum | AI Travel Intelligence",
     template: "%s | Travellum",
   },
-  description: "Your personal AI travel guide. Real-time safety insights, immersive audio advisories, and smart budget predictions.",
+  description:
+    "Your personal AI travel guide. Real-time safety insights, immersive audio advisories, and smart budget predictions.",
   applicationName: "Travellum",
   authors: [{ name: "Istiyaq Khan Razin" }],
-  keywords: ["Travel", "AI", "Safety", "Budget", "Guide", "Travellum", "Trip Planner", "Smart Travel"],
   creator: "Istiyaq Khan Razin",
   publisher: "Istiyaq Khan Razin",
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://travellum.vercel.app"),
+  keywords: [
+    "AI Travel",
+    "Travel Safety",
+    "Budget Travel",
+    "Smart Travel Guide",
+    "Travellum",
+    "Trip Planner",
+  ],
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "https://travellum.vercel.app"
+  ),
   openGraph: {
     title: "Travellum | AI Travel Intelligence",
-    description: "Your personal AI travel guide. Real-time safety insights, immersive audio advisories, and smart budget predictions.",
+    description:
+      "Your personal AI travel guide. Real-time safety insights, immersive audio advisories, and smart budget predictions.",
     url: "https://travellum.vercel.app",
     siteName: "Travellum",
     locale: "en_US",
@@ -41,10 +52,14 @@ export const metadata: Metadata = {
       },
     ],
   },
+  verification: {
+    google: "r7320kg3zhgfCc-dBs17Z5HYl2vblzN0-f5aIWVVp7M",
+  },
   twitter: {
     card: "summary_large_image",
     title: "Travellum | AI Travel Intelligence",
-    description: "Your personal AI travel guide. Real-time safety insights, immersive audio advisories, and smart budget predictions.",
+    description:
+      "Your personal AI travel guide. Real-time safety insights, immersive audio advisories, and smart budget predictions.",
     images: ["/icon.png"],
     creator: "@istiyaqkhanr",
   },
@@ -61,13 +76,49 @@ export const metadata: Metadata = {
   },
 };
 
+const personSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Istiyaq Khan Razin",
+  jobTitle: "Founder & Automation Engineer",
+  url: "https://istiyaq.vercel.app/about",
+  sameAs: [
+    "https://github.com/Istiyaq-Khan",
+    "https://www.linkedin.com/in/istiyaq-khan",
+    "https://www.instagram.com/ist.iyaqkhan",
+    "https://www.youtube.com/@istiyaq-khan10",
+    "https://x.com/istiyaqkhanr",
+    "https://istiyaq.vercel.app"'
+  ],
+  knowsAbout: [
+    "Video Editing",
+    "Motion Graphics",
+    "Python",
+    "n8n",
+    "Automation",
+    "YouTube Growth",
+  ],
+  description:
+    "A Sylhet-based professional positioning himself at the intersection of creative media and technical automation.",
+};
+
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
+      <head>
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(personSchema),
+          }}
+        />
+      </head>
+
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
